@@ -26,6 +26,10 @@ local function init()
         end
     end)
 end
+-- ----------------------------- cooldownPassed ----------------------------- --
+local function cooldownPassed(startTime, durationMs)
+    return not startTime or (GetGameTimer() - startTime) >= durationMs
+end
 
 -- -------------------------- distance() ------------------------- --
 --checks player distance to spawn zones
@@ -142,12 +146,14 @@ local function spawnLegendaryAnimal(animalName, coords)
         dprint(("[DEBUG] Spawned legendary animal: %s | Entity: %s"):format(animalName, tostring(entity)))
         InCombat = true
         -- Store and sync the network ID
-        -- local netId = NetworkGetNetworkIdFromEntity(entity)
         local netId = PedToNet(entity)
         LegendarySpawnCoords[animalName].spawnedEntity = netId
 
         -- Notify the server
         TriggerServerEvent("bnddo_legendary:server:animalSpawned", animalName, entity, netId, true)
+        if Config.FreezeLegendary then
+            FreezeEntityPosition(entity, true)
+        end
 
         -- Initial setup
         SetAttributeCoreValue(entity, 0, animalConfig.Object.Health or 10000) -- Health
@@ -186,6 +192,18 @@ local function handlePlayerEnterLegendaryZone(name, legendary)
 
     -- Notify server that the player is now in the zone
     TriggerServerEvent("bnddo_legendary:server:updatePlayerInZone", name, true)
+
+    if legendary.spawned or legendary.killed then
+        dprint(("Legendary animal already spawned or killed: %s"):format(name))
+        return
+    end
+
+    local currentTime = GetGameTimer()
+
+    if not cooldownPassed(legendary.spawnedTime, Config.ClientCooldown) then
+        dprint(("Legendary animal spawn cooldown active for: %s"):format(name))
+        return
+    end
 
     -- Ask the server if we can spawn the legendary animal
     jo.callback.triggerServer("bnddo_legendary:server:trySpawnLegendary", function(canSpawn, netId)
@@ -232,16 +250,23 @@ RegisterNetEvent("bnddo_legendary:client:spawnLegendaryAnimal", function(animalN
 end)
 
 RegisterNetEvent("bnddo_legendary:client:updateStatus", function(animalName, action)
-    if not LegendarySpawnCoords[animalName] then return end
+    if not LegendarySpawnCoords[animalName] then
+        dprint(("[WARN] Missing LegendarySpawnCoords entry for: %s"):format(animalName))
+        init() -- or re-request that specific animal
+        return
+    end
 
     if action == "killed" then
         LegendarySpawnCoords[animalName].killed = true
         dprint(("Legendary animal killed: %s"):format(animalName))
     elseif action == "spawned" then
         LegendarySpawnCoords[animalName].spawned = true
+        LegendarySpawnCoords[animalName].spawnedTime = GetGameTimer()
         dprint(("Legendary animal spawned: %s"):format(animalName))
     elseif action == "despawned" then
         LegendarySpawnCoords[animalName].spawned = false
+        LegendarySpawnCoords[animalName].spawnedEntity = nil
+        LegendarySpawnCoords[animalName].spawnedTime = GetGameTimer()
         dprint(("Legendary animal deleted: %s"):format(animalName))
     end
 end)
@@ -269,11 +294,11 @@ CreateThread(function()
     local inZone = {} -- Tracks per-animal zone status
 
     while true do
-        local timeout = 100
+        local timeout = 1000
         local playerCoords = GetEntityCoords(playerPed)
 
         for name, legendary in pairs(LegendarySpawnCoords) do
-            if legendary.coords and (not legendary.spawned and not legendary.killed) then
+            if legendary.coords then
                 local distanceToAnimal = distance(playerCoords, legendary.coords)
 
                 -- Entered spawn zone

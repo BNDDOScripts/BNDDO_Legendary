@@ -40,8 +40,8 @@ Config.LegendaryAnimals = {
             defaultOutfit = -1,
         },
         spawnChance = 0.2,  -- -- 0.0 - 1.0 = 0% - 100% chance to spawn
-        alertDistance = 75, -- distance at which the animal will be alert of players
-        huntArea = 50,      -- anything outside this distance will try despawn animal
+        alertDistance = 50, -- distance at which the animal will be alert of players
+        huntArea = 200,     -- anything outside this distance will try despawn animal
         coolDown = 30,      -- In seconds, this is a respawn cooldown, after animal has despawned. (killed animals don't respawn)
         showBlip = false    -- Not implemented yet
     },
@@ -55,8 +55,8 @@ Config.LegendaryAnimals = {
             defaultOutfit = 2,
         },
         spawnChance = 0.15, -- -- 0.0 - 1.0 = 0% - 100% chance to spawn
-        alertDistance = 75, -- distance at which the animal will be alert of players
-        huntArea = 300,     -- anything outside this distance will try despawn animal
+        alertDistance = 50, -- distance at which the animal will be alert of players
+        huntArea = 200,     -- anything outside this distance will try despawn animal
         coolDown = 45,      -- Not implemented yet
         showBlip = false    -- Not implemented yet
     },

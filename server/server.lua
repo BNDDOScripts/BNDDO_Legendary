@@ -239,6 +239,24 @@ exports("despawnLegendary", despawnLegendary)
 exports("initLegendaryAnimals", initLegendaryAnimals)
 
 
+-- -------------------------------------------------------------------------- --
+--                                  COMMANDS                                  --
+-- -------------------------------------------------------------------------- --
+-- turn debug mode on or off
+RegisterCommand("legendaryDebug", function(source, args, raw)
+    if not args[1] or args[1] ~= "on" and args[1] ~= "off" then
+        gprint("Usage: /legendaryDebug on|off")
+        return
+    end
+    ExecuteCommand(string.format("setr bnddo_legendary:debug %s", args[1]))
+end, true)
+
+--prints legendaries
+RegisterCommand("getLegendaries", function(source, args, rawCommand)
+    gprint(json.encode(SpawnCoords))
+end, true)
+
+
 
 
 if Config.DevMode then

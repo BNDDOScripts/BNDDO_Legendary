@@ -54,11 +54,11 @@ Config.LegendaryAnimals = {
             Health = 18000,
             defaultOutfit = 2,
         },
-        spawnChance = 0.15, -- -- 0.0 - 1.0 = 0% - 100% chance to spawn
-        alertDistance = 50, -- distance at which the animal will be alert of players
-        huntArea = 200,     -- anything outside this distance will try despawn animal
-        coolDown = 45,      -- Not implemented yet
-        showBlip = false    -- Not implemented yet
+        spawnChance = 0.15, 
+        alertDistance = 50, 
+        huntArea = 200,     
+        coolDown = 45,      
+        showBlip = false    
     },
 
 }

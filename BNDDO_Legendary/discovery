@@ -1,0 +1,10 @@
+p_cs_log01x - log object
+p_tree_douglasfir_04 - tree object
+
+
+pickup animation
+dict: mech_pickup@dyn_bundle@pickup
+anim: 1 enter_rf Wait(1370ms)
+AttachEntityToEnttiy
+Pickup Animation
+anim: base (2.10)

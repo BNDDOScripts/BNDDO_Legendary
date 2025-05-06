@@ -18,6 +18,7 @@ jo_libs {
     'callback',
     'table',
     'entity',
+    'game-events',
 }
 
 client_scripts {
